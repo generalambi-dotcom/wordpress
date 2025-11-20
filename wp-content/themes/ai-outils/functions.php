@@ -87,39 +87,41 @@ if ( ! function_exists( 'ai_outils_enqueue_assets' ) ) {
      * Enqueue theme styles and scripts
      */
     function ai_outils_enqueue_assets() {
-        // Main stylesheet
+        // Main stylesheet - using direct path to ensure it loads
         wp_enqueue_style(
             'ai-outils-style',
             get_stylesheet_uri(),
             array(),
-            AI_OUTILS_VERSION
-        );
-
-        // Main JavaScript (if needed)
-        wp_enqueue_script(
-            'ai-outils-main',
-            get_template_directory_uri() . '/assets/js/main.js',
-            array(),
             AI_OUTILS_VERSION,
-            true
+            'all'
         );
 
-        // Add inline script for mobile menu toggle
-        $inline_js = "
-            document.addEventListener('DOMContentLoaded', function() {
-                const toggle = document.querySelector('.mobile-menu-toggle');
-                const nav = document.querySelector('.main-nav');
-                if (toggle && nav) {
-                    toggle.addEventListener('click', function() {
-                        nav.classList.toggle('active');
-                    });
-                }
-            });
-        ";
-        wp_add_inline_script( 'ai-outils-main', $inline_js );
+        // Add critical inline CSS as fallback to ensure basic styling
+        $critical_css = '
+            :root{--color-primary:#8B5CF6;--color-text:#1F2937;--color-bg:#FFFFFF;--color-border:#E5E7EB}
+            *{margin:0;padding:0;box-sizing:border-box}
+            body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;line-height:1.6;color:var(--color-text)}
+            .container{max-width:1280px;margin:0 auto;padding:0 1rem}
+            .site-header{background:var(--color-bg);border-bottom:1px solid var(--color-border);padding:1rem 0}
+            .btn{display:inline-flex;padding:0.75rem 1.5rem;border-radius:0.5rem;text-decoration:none;font-weight:500}
+            .btn-primary{background:var(--color-primary);color:#fff}
+        ';
+        wp_add_inline_style( 'ai-outils-style', $critical_css );
+
+        // Main JavaScript - only load if file exists
+        $js_file = get_template_directory() . '/assets/js/main.js';
+        if ( file_exists( $js_file ) ) {
+            wp_enqueue_script(
+                'ai-outils-main',
+                get_template_directory_uri() . '/assets/js/main.js',
+                array(),
+                AI_OUTILS_VERSION,
+                true
+            );
+        }
     }
 }
-add_action( 'wp_enqueue_scripts', 'ai_outils_enqueue_assets' );
+add_action( 'wp_enqueue_scripts', 'ai_outils_enqueue_assets', 10 );
 
 /**
  * ============================================================================
