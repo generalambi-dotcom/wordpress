@@ -10,10 +10,11 @@ $current_brand    = get_query_var( 'brand' );
 $min_price        = isset( $_GET['min_price'] ) ? intval( $_GET['min_price'] ) : 0;
 $max_price        = isset( $_GET['max_price'] ) ? intval( $_GET['max_price'] ) : 0;
 $current_color    = isset( $_GET['color'] ) ? sanitize_text_field( $_GET['color'] ) : '';
+$current_gender   = isset( $_GET['gender'] ) ? sanitize_text_field( $_GET['gender'] ) : '';
 $current_sort     = isset( $_GET['sort'] ) ? sanitize_text_field( $_GET['sort'] ) : '';
 
 $price_range      = lyststyle_get_price_range();
-$colors           = lyststyle_get_all_colors();
+$colors           = lyststyle_get_available_colours();
 ?>
 
 <div class="filters-bar">
@@ -74,9 +75,9 @@ $colors           = lyststyle_get_all_colors();
             <!-- Color Filter -->
             <?php if ( ! empty( $colors ) ) : ?>
             <div class="filter-group">
-                <label for="filter-color" class="filter-label"><?php esc_html_e( 'Color', 'lyststyle-aggregator' ); ?></label>
+                <label for="filter-color" class="filter-label"><?php esc_html_e( 'Colour', 'lyststyle-aggregator' ); ?></label>
                 <select name="color" id="filter-color" class="filter-select">
-                    <option value=""><?php esc_html_e( 'All Colors', 'lyststyle-aggregator' ); ?></option>
+                    <option value=""><?php esc_html_e( 'All Colours', 'lyststyle-aggregator' ); ?></option>
                     <?php foreach ( $colors as $color ) : ?>
                         <option value="<?php echo esc_attr( $color ); ?>" <?php selected( $current_color, $color ); ?>>
                             <?php echo esc_html( $color ); ?>
@@ -85,6 +86,17 @@ $colors           = lyststyle_get_all_colors();
                 </select>
             </div>
             <?php endif; ?>
+
+            <!-- Gender Filter -->
+            <div class="filter-group">
+                <label for="filter-gender" class="filter-label"><?php esc_html_e( 'Gender', 'lyststyle-aggregator' ); ?></label>
+                <select name="gender" id="filter-gender" class="filter-select">
+                    <option value=""><?php esc_html_e( 'All', 'lyststyle-aggregator' ); ?></option>
+                    <option value="women" <?php selected( $current_gender, 'women' ); ?>><?php esc_html_e( 'Women', 'lyststyle-aggregator' ); ?></option>
+                    <option value="men" <?php selected( $current_gender, 'men' ); ?>><?php esc_html_e( 'Men', 'lyststyle-aggregator' ); ?></option>
+                    <option value="unisex" <?php selected( $current_gender, 'unisex' ); ?>><?php esc_html_e( 'Unisex', 'lyststyle-aggregator' ); ?></option>
+                </select>
+            </div>
 
             <!-- Price Range -->
             <div class="filter-group filter-price">

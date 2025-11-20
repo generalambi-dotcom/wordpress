@@ -18,7 +18,7 @@ if ( ! $products_query ) {
 
 if ( $products_query->have_posts() ) :
     ?>
-    <div class="products-grid">
+    <div class="products-grid grid-4">
         <?php
         while ( $products_query->have_posts() ) :
             $products_query->the_post();

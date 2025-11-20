@@ -34,6 +34,70 @@ function lyststyle_add_product_meta_boxes() {
 add_action( 'add_meta_boxes', 'lyststyle_add_product_meta_boxes' );
 
 /**
+ * Add Article Meta Boxes
+ */
+function lyststyle_add_article_meta_boxes() {
+    add_meta_box(
+        'lyststyle_article_related_products',
+        __( 'Recommended Products', 'lyststyle-aggregator' ),
+        'lyststyle_article_related_products_callback',
+        'article',
+        'normal',
+        'default'
+    );
+}
+add_action( 'add_meta_boxes', 'lyststyle_add_article_meta_boxes' );
+
+/**
+ * Article Related Products Meta Box Callback
+ */
+function lyststyle_article_related_products_callback( $post ) {
+    wp_nonce_field( 'lyststyle_save_article_meta', 'lyststyle_article_meta_nonce' );
+
+    $related_products = get_post_meta( $post->ID, '_article_related_products', true );
+    if ( ! is_array( $related_products ) ) {
+        $related_products = array();
+    }
+
+    // Get all products for selection
+    $products = get_posts( array(
+        'post_type'      => 'product',
+        'posts_per_page' => -1,
+        'orderby'        => 'title',
+        'order'          => 'ASC',
+    ) );
+    ?>
+    <div class="lyststyle-article-products">
+        <p><?php esc_html_e( 'Select products to recommend at the bottom of this article. If no products are selected, recent products will be displayed.', 'lyststyle-aggregator' ); ?></p>
+
+        <div style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 15px; background: #f9f9f9;">
+            <?php if ( ! empty( $products ) ) : ?>
+                <?php foreach ( $products as $product ) : ?>
+                    <label style="display: block; margin-bottom: 10px;">
+                        <input
+                            type="checkbox"
+                            name="article_related_products[]"
+                            value="<?php echo esc_attr( $product->ID ); ?>"
+                            <?php checked( in_array( $product->ID, $related_products ) ); ?>
+                        >
+                        <?php echo esc_html( $product->post_title ); ?>
+                        <?php
+                        $brand = lyststyle_get_product_brand( $product->ID );
+                        if ( $brand ) {
+                            echo '<span style="color: #666;"> (' . esc_html( $brand ) . ')</span>';
+                        }
+                        ?>
+                    </label>
+                <?php endforeach; ?>
+            <?php else : ?>
+                <p><?php esc_html_e( 'No products found. Please create some products first.', 'lyststyle-aggregator' ); ?></p>
+            <?php endif; ?>
+        </div>
+    </div>
+    <?php
+}
+
+/**
  * Product Details Meta Box Callback
  */
 function lyststyle_product_details_callback( $post ) {
@@ -277,3 +341,34 @@ function lyststyle_save_product_meta( $post_id ) {
     }
 }
 add_action( 'save_post_product', 'lyststyle_save_product_meta' );
+
+/**
+ * Save Article Meta
+ */
+function lyststyle_save_article_meta( $post_id ) {
+    // Check nonce
+    if ( ! isset( $_POST['lyststyle_article_meta_nonce'] ) ||
+         ! wp_verify_nonce( $_POST['lyststyle_article_meta_nonce'], 'lyststyle_save_article_meta' ) ) {
+        return;
+    }
+
+    // Check autosave
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+        return;
+    }
+
+    // Check permissions
+    if ( ! current_user_can( 'edit_post', $post_id ) ) {
+        return;
+    }
+
+    // Save related products
+    if ( isset( $_POST['article_related_products'] ) && is_array( $_POST['article_related_products'] ) ) {
+        $product_ids = array_map( 'intval', $_POST['article_related_products'] );
+        update_post_meta( $post_id, '_article_related_products', $product_ids );
+    } else {
+        // If no products selected, save empty array
+        update_post_meta( $post_id, '_article_related_products', array() );
+    }
+}
+add_action( 'save_post_article', 'lyststyle_save_article_meta' );

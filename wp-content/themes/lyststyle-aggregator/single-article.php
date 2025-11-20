@@ -78,31 +78,38 @@ while ( have_posts() ) :
 
             </article>
 
-            <!-- Related Articles -->
+            <!-- Recommended Products -->
             <?php
-            $related_args = array(
-                'post_type'      => 'article',
-                'posts_per_page' => 3,
-                'post__not_in'   => array( get_the_ID() ),
-                'orderby'        => 'rand',
-            );
+            // Get related products from custom meta field
+            $related_product_ids = get_post_meta( get_the_ID(), '_article_related_products', true );
 
-            $categories = get_the_category();
-            if ( $categories ) {
-                $related_args['category__in'] = wp_list_pluck( $categories, 'term_id' );
+            // If no related products are set, get recent products
+            if ( empty( $related_product_ids ) || ! is_array( $related_product_ids ) ) {
+                $products_query = new WP_Query( array(
+                    'post_type'      => 'product',
+                    'posts_per_page' => 4,
+                    'orderby'        => 'date',
+                    'order'          => 'DESC',
+                ) );
+            } else {
+                // Query products by IDs
+                $products_query = new WP_Query( array(
+                    'post_type'      => 'product',
+                    'posts_per_page' => -1,
+                    'post__in'       => $related_product_ids,
+                    'orderby'        => 'post__in',
+                ) );
             }
 
-            $related_articles = new WP_Query( $related_args );
-
-            if ( $related_articles->have_posts() ) :
+            if ( $products_query->have_posts() ) :
                 ?>
-                <section class="related-articles section-padding">
-                    <h2 class="section-title"><?php esc_html_e( 'More Fashion Guides', 'lyststyle-aggregator' ); ?></h2>
-                    <div class="articles-grid">
+                <section class="recommended-products section-padding">
+                    <h2 class="section-title"><?php esc_html_e( 'Recommended Products', 'lyststyle-aggregator' ); ?></h2>
+                    <div class="products-grid">
                         <?php
-                        while ( $related_articles->have_posts() ) :
-                            $related_articles->the_post();
-                            get_template_part( 'template-parts/article', 'card' );
+                        while ( $products_query->have_posts() ) :
+                            $products_query->the_post();
+                            get_template_part( 'template-parts/product', 'card' );
                         endwhile;
                         wp_reset_postdata();
                         ?>

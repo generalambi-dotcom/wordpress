@@ -1,11 +1,13 @@
 <?php
 /**
- * The template for displaying search results pages
+ * The template for displaying search results
  *
  * @package Lyststyle_Aggregator
  */
 
 get_header();
+
+$search_query = get_search_query();
 ?>
 
 <main id="primary" class="site-main search-results">
@@ -15,90 +17,152 @@ get_header();
             <h1 class="page-title">
                 <?php
                 printf(
+                    /* translators: %s: search query */
                     esc_html__( 'Search Results for: %s', 'lyststyle-aggregator' ),
-                    '<span>' . get_search_query() . '</span>'
+                    '<span>' . esc_html( $search_query ) . '</span>'
                 );
                 ?>
             </h1>
         </header>
 
-        <?php if ( have_posts() ) : ?>
+        <?php
+        // Query 1: Search Products
+        $products_query = new WP_Query(
+            array(
+                'post_type'      => 'product',
+                's'              => $search_query,
+                'posts_per_page' => 24,
+                'paged'          => get_query_var( 'paged' ) ? get_query_var( 'paged' ) : 1,
+            )
+        );
 
-            <?php
-            // Separate products from other post types
-            $products = array();
-            $others   = array();
+        if ( $products_query->have_posts() ) :
+            ?>
 
-            while ( have_posts() ) :
-                the_post();
-                if ( get_post_type() === 'product' ) {
-                    $products[] = $GLOBALS['post'];
-                } else {
-                    $others[] = $GLOBALS['post'];
-                }
-            endwhile;
-
-            // Display products first
-            if ( ! empty( $products ) ) :
-                ?>
-                <section class="search-products">
+            <section class="search-section search-products">
+                <div class="section-header">
                     <h2 class="section-title"><?php esc_html_e( 'Products', 'lyststyle-aggregator' ); ?></h2>
-                    <div class="products-grid">
+                    <p class="results-count">
                         <?php
-                        foreach ( $products as $post ) :
-                            setup_postdata( $post );
-                            get_template_part( 'template-parts/product', 'card' );
-                        endforeach;
-                        wp_reset_postdata();
+                        printf(
+                            /* translators: %s: number of products found */
+                            esc_html( _n( '%s product found', '%s products found', $products_query->found_posts, 'lyststyle-aggregator' ) ),
+                            '<strong>' . esc_html( number_format_i18n( $products_query->found_posts ) ) . '</strong>'
+                        );
                         ?>
-                    </div>
-                </section>
-            <?php endif; ?>
+                    </p>
+                </div>
 
-            <?php
-            // Display other content
-            if ( ! empty( $others ) ) :
+                <?php get_template_part( 'template-parts/filters', 'bar' ); ?>
+
+                <div class="products-grid">
+                    <?php
+                    while ( $products_query->have_posts() ) :
+                        $products_query->the_post();
+                        get_template_part( 'template-parts/product', 'card' );
+                    endwhile;
+                    ?>
+                </div>
+
+                <?php
+                // Pagination for products
+                $big = 999999999;
+                echo '<div class="pagination">';
+                echo paginate_links(
+                    array(
+                        'base'      => str_replace( $big, '%#%', esc_url( get_pagenum_link( $big ) ) ),
+                        'format'    => '?paged=%#%',
+                        'current'   => max( 1, get_query_var( 'paged' ) ),
+                        'total'     => $products_query->max_num_pages,
+                        'prev_text' => '&laquo; ' . esc_html__( 'Previous', 'lyststyle-aggregator' ),
+                        'next_text' => esc_html__( 'Next', 'lyststyle-aggregator' ) . ' &raquo;',
+                    )
+                );
+                echo '</div>';
                 ?>
-                <section class="search-content">
-                    <h2 class="section-title"><?php esc_html_e( 'Articles & Pages', 'lyststyle-aggregator' ); ?></h2>
-                    <div class="posts-list">
+
+            </section>
+
+        <?php
+        endif;
+        wp_reset_postdata();
+        ?>
+
+        <?php
+        // Query 2: Search Articles
+        $articles_query = new WP_Query(
+            array(
+                'post_type'      => 'article',
+                's'              => $search_query,
+                'posts_per_page' => 12,
+            )
+        );
+
+        if ( $articles_query->have_posts() ) :
+            ?>
+
+            <section class="search-section search-articles">
+                <div class="section-header">
+                    <h2 class="section-title"><?php esc_html_e( 'Articles & Guides', 'lyststyle-aggregator' ); ?></h2>
+                    <p class="results-count">
                         <?php
-                        foreach ( $others as $post ) :
-                            setup_postdata( $post );
-                            ?>
-                            <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-                                <header class="entry-header">
-                                    <h3 class="entry-title">
-                                        <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-                                    </h3>
-                                    <div class="entry-meta">
-                                        <span class="post-type"><?php echo esc_html( get_post_type_object( get_post_type() )->labels->singular_name ); ?></span>
-                                        <span class="posted-on"><?php echo esc_html( get_the_date() ); ?></span>
-                                    </div>
-                                </header>
-
-                                <div class="entry-summary">
-                                    <?php the_excerpt(); ?>
-                                </div>
-                            </article>
-                            <?php
-                        endforeach;
-                        wp_reset_postdata();
+                        printf(
+                            /* translators: %s: number of articles found */
+                            esc_html( _n( '%s article found', '%s articles found', $articles_query->found_posts, 'lyststyle-aggregator' ) ),
+                            '<strong>' . esc_html( number_format_i18n( $articles_query->found_posts ) ) . '</strong>'
+                        );
                         ?>
-                    </div>
-                </section>
-            <?php endif; ?>
+                    </p>
+                </div>
 
-            <?php lyststyle_pagination(); ?>
+                <div class="articles-grid">
+                    <?php
+                    while ( $articles_query->have_posts() ) :
+                        $articles_query->the_post();
+                        get_template_part( 'template-parts/article', 'card' );
+                    endwhile;
+                    ?>
+                </div>
+            </section>
 
-        <?php else : ?>
+        <?php
+        endif;
+        wp_reset_postdata();
+        ?>
+
+        <?php
+        // No results found
+        if ( ! $products_query->have_posts() && ! $articles_query->have_posts() ) :
+            ?>
 
             <div class="no-results">
                 <h2><?php esc_html_e( 'Nothing Found', 'lyststyle-aggregator' ); ?></h2>
                 <p><?php esc_html_e( 'Sorry, but nothing matched your search terms. Please try again with different keywords.', 'lyststyle-aggregator' ); ?></p>
 
-                <div class="search-form-wrapper">
-                    <?php get_search_form(); ?>
+                <div class="search-suggestions">
+                    <h3><?php esc_html_e( 'Search Suggestions:', 'lyststyle-aggregator' ); ?></h3>
+                    <ul>
+                        <li><?php esc_html_e( 'Check your spelling', 'lyststyle-aggregator' ); ?></li>
+                        <li><?php esc_html_e( 'Try more general keywords', 'lyststyle-aggregator' ); ?></li>
+                        <li><?php esc_html_e( 'Try different keywords', 'lyststyle-aggregator' ); ?></li>
+                    </ul>
+                </div>
+
+                <div class="search-try-again">
+                    <form role="search" method="get" class="search-form" action="<?php echo esc_url( home_url( '/' ) ); ?>">
+                        <div class="search-input-wrapper">
+                            <input
+                                type="search"
+                                class="search-field"
+                                placeholder="<?php echo esc_attr_x( 'Try another search...', 'placeholder', 'lyststyle-aggregator' ); ?>"
+                                value=""
+                                name="s"
+                            />
+                            <button type="submit" class="search-submit">
+                                <?php esc_html_e( 'Search', 'lyststyle-aggregator' ); ?>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
 

@@ -104,6 +104,13 @@ function lyststyle_get_all_colors() {
 }
 
 /**
+ * Get available colours (alias for lyststyle_get_all_colors)
+ */
+function lyststyle_get_available_colours() {
+    return lyststyle_get_all_colors();
+}
+
+/**
  * Get price range
  */
 function lyststyle_get_price_range() {
@@ -197,6 +204,91 @@ function lyststyle_is_in_wishlist( $product_id ) {
 }
 
 /**
+ * Get product affiliate links
+ */
+function lyststyle_get_product_affiliate_links( $product_id ) {
+    $affiliate_links = get_post_meta( $product_id, '_product_affiliate_links', true );
+    $links = $affiliate_links ? json_decode( $affiliate_links, true ) : array();
+
+    if ( empty( $links ) || ! is_array( $links ) ) {
+        return array();
+    }
+
+    // Sort by price (lowest first)
+    usort( $links, function( $a, $b ) {
+        return floatval( $a['price'] ) - floatval( $b['price'] );
+    } );
+
+    return $links;
+}
+
+/**
+ * Get minimum product price
+ */
+function lyststyle_get_product_min_price( $product_id ) {
+    return lyststyle_get_product_price( $product_id );
+}
+
+/**
+ * Get similar products based on brand and category
+ */
+function lyststyle_get_similar_products( $product_id, $limit = 4 ) {
+    $brand = lyststyle_get_product_brand( $product_id );
+    $category = lyststyle_get_product_category( $product_id );
+
+    $args = array(
+        'post_type'      => 'product',
+        'posts_per_page' => $limit,
+        'post__not_in'   => array( $product_id ),
+        'orderby'        => 'rand',
+    );
+
+    // Try to get products from same brand first
+    if ( $brand ) {
+        $brand_term = get_term_by( 'name', $brand, 'brand' );
+        if ( $brand_term ) {
+            $args['tax_query'] = array(
+                array(
+                    'taxonomy' => 'brand',
+                    'field'    => 'term_id',
+                    'terms'    => $brand_term->term_id,
+                ),
+            );
+        }
+    }
+
+    $related_products = new WP_Query( $args );
+
+    // If not enough products from same brand, try same category
+    if ( $related_products->post_count < $limit && $category ) {
+        $category_term = get_term_by( 'name', $category, 'product_category' );
+        if ( $category_term ) {
+            $args = array(
+                'post_type'      => 'product',
+                'posts_per_page' => $limit - $related_products->post_count,
+                'post__not_in'   => array( $product_id ),
+                'orderby'        => 'rand',
+                'tax_query'      => array(
+                    array(
+                        'taxonomy' => 'product_category',
+                        'field'    => 'term_id',
+                        'terms'    => $category_term->term_id,
+                    ),
+                ),
+            );
+
+            $category_products = new WP_Query( $args );
+            if ( $category_products->have_posts() ) {
+                $related_products->posts = array_merge( $related_products->posts, $category_products->posts );
+                $related_products->post_count = count( $related_products->posts );
+            }
+        }
+    }
+
+    return $related_products;
+}
+
+/**
  * Breadcrumbs
  */
 function lyststyle_breadcrumbs() {
@@ -232,4 +324,104 @@ function lyststyle_breadcrumbs() {
 
     echo '</ul>';
     echo '</nav>';
+}
+
+/**
+ * Get available price bands
+ */
+function lyststyle_get_price_bands() {
+    return array(
+        'budget'      => __( 'Budget (Under £100)', 'lyststyle-aggregator' ),
+        'mid-range'   => __( 'Mid-Range (£100 - £500)', 'lyststyle-aggregator' ),
+        'premium'     => __( 'Premium (£500 - £1,500)', 'lyststyle-aggregator' ),
+        'luxury'      => __( 'Luxury (£1,500+)', 'lyststyle-aggregator' ),
+    );
+}
+
+/**
+ * Get available occasions
+ */
+function lyststyle_get_occasions() {
+    return array(
+        'casual'       => __( 'Casual', 'lyststyle-aggregator' ),
+        'work'         => __( 'Work', 'lyststyle-aggregator' ),
+        'formal'       => __( 'Formal', 'lyststyle-aggregator' ),
+        'evening'      => __( 'Evening', 'lyststyle-aggregator' ),
+        'sports'       => __( 'Sports & Active', 'lyststyle-aggregator' ),
+        'wedding'      => __( 'Wedding', 'lyststyle-aggregator' ),
+        'party'        => __( 'Party', 'lyststyle-aggregator' ),
+        'vacation'     => __( 'Vacation', 'lyststyle-aggregator' ),
+    );
+}
+
+/**
+ * Get user preferences
+ *
+ * @param int $user_id User ID (defaults to current user).
+ * @return array User preferences.
+ */
+function lyststyle_get_user_preferences( $user_id = 0 ) {
+    if ( ! $user_id ) {
+        $user_id = get_current_user_id();
+    }
+
+    if ( ! $user_id ) {
+        return array();
+    }
+
+    $preferences = get_user_meta( $user_id, 'lyststyle_preferences', true );
+
+    if ( ! is_array( $preferences ) ) {
+        $preferences = array();
+    }
+
+    // Set defaults
+    $defaults = array(
+        'gender'              => '',
+        'categories'          => array(),
+        'brands'              => array(),
+        'price_band'          => '',
+        'price_min'           => '',
+        'price_max'           => '',
+        'colours'             => array(),
+        'styles'              => array(),
+        'occasions'           => array(),
+        'shoe_size'           => '',
+        'clothing_size_top'   => '',
+        'clothing_size_bottom' => '',
+        'clothing_size_dress' => '',
+    );
+
+    return wp_parse_args( $preferences, $defaults );
+}
+
+/**
+ * Save user preferences from request
+ *
+ * @param int $user_id User ID.
+ * @param array $request Request data (typically $_POST).
+ * @return bool True on success, false on failure.
+ */
+function lyststyle_save_user_preferences_from_request( $user_id, $request ) {
+    if ( ! $user_id ) {
+        return false;
+    }
+
+    $preferences = array(
+        'gender'              => isset( $request['gender'] ) ? sanitize_text_field( $request['gender'] ) : '',
+        'categories'          => isset( $request['categories'] ) && is_array( $request['categories'] ) ? array_map( 'sanitize_text_field', $request['categories'] ) : array(),
+        'brands'              => isset( $request['brands'] ) && is_array( $request['brands'] ) ? array_map( 'sanitize_text_field', $request['brands'] ) : array(),
+        'price_band'          => isset( $request['price_band'] ) ? sanitize_text_field( $request['price_band'] ) : '',
+        'price_min'           => isset( $request['price_min'] ) ? sanitize_text_field( $request['price_min'] ) : '',
+        'price_max'           => isset( $request['price_max'] ) ? sanitize_text_field( $request['price_max'] ) : '',
+        'colours'             => isset( $request['colours'] ) && is_array( $request['colours'] ) ? array_map( 'sanitize_text_field', $request['colours'] ) : array(),
+        'styles'              => isset( $request['styles'] ) && is_array( $request['styles'] ) ? array_map( 'sanitize_text_field', $request['styles'] ) : array(),
+        'occasions'           => isset( $request['occasions'] ) && is_array( $request['occasions'] ) ? array_map( 'sanitize_text_field', $request['occasions'] ) : array(),
+        'shoe_size'           => isset( $request['shoe_size'] ) ? sanitize_text_field( $request['shoe_size'] ) : '',
+        'clothing_size_top'   => isset( $request['clothing_size_top'] ) ? sanitize_text_field( $request['clothing_size_top'] ) : '',
+        'clothing_size_bottom' => isset( $request['clothing_size_bottom'] ) ? sanitize_text_field( $request['clothing_size_bottom'] ) : '',
+        'clothing_size_dress' => isset( $request['clothing_size_dress'] ) ? sanitize_text_field( $request['clothing_size_dress'] ) : '',
+    );
+
+    return update_user_meta( $user_id, 'lyststyle_preferences', $preferences );
 }

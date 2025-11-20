@@ -13,12 +13,26 @@ get_header();
 
         <?php lyststyle_breadcrumbs(); ?>
 
-        <header class="page-header">
-            <h1 class="page-title"><?php esc_html_e( 'Fashion Guides & Articles', 'lyststyle-aggregator' ); ?></h1>
-            <p class="page-description"><?php esc_html_e( 'Discover the latest trends, style tips, and fashion inspiration.', 'lyststyle-aggregator' ); ?></p>
-        </header>
+        <!-- Hero Area -->
+        <div class="hero-area">
+            <h1 class="hero-title"><?php esc_html_e( 'Guides & Stories', 'lyststyle-aggregator' ); ?></h1>
+            <p class="hero-description"><?php esc_html_e( 'Discover the latest trends, style tips, and fashion inspiration.', 'lyststyle-aggregator' ); ?></p>
+        </div>
 
         <?php if ( have_posts() ) : ?>
+
+            <div class="articles-header">
+                <p class="articles-count">
+                    <?php
+                    global $wp_query;
+                    $total = $wp_query->found_posts;
+                    printf(
+                        esc_html( _n( '%s article found', '%s articles found', $total, 'lyststyle-aggregator' ) ),
+                        '<strong>' . number_format_i18n( $total ) . '</strong>'
+                    );
+                    ?>
+                </p>
+            </div>
 
             <div class="articles-grid">
                 <?php

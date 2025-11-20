@@ -146,27 +146,7 @@ while ( have_posts() ) :
 
             <!-- Related Products -->
             <?php
-            $related_args = array(
-                'post_type'      => 'product',
-                'posts_per_page' => 4,
-                'post__not_in'   => array( $product_id ),
-                'orderby'        => 'rand',
-            );
-
-            if ( $brand ) {
-                $brand_term = get_term_by( 'name', $brand, 'brand' );
-                if ( $brand_term ) {
-                    $related_args['tax_query'] = array(
-                        array(
-                            'taxonomy' => 'brand',
-                            'field'    => 'term_id',
-                            'terms'    => $brand_term->term_id,
-                        ),
-                    );
-                }
-            }
-
-            $related_products = new WP_Query( $related_args );
+            $related_products = lyststyle_get_similar_products( $product_id, 4 );
 
             if ( $related_products->have_posts() ) :
                 ?>

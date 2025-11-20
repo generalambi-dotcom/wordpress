@@ -7,7 +7,7 @@
 
 $product_id = get_the_ID();
 $brand      = lyststyle_get_product_brand( $product_id );
-$price      = lyststyle_get_product_price( $product_id );
+$price      = lyststyle_get_product_min_price( $product_id );
 $currency   = get_post_meta( $product_id, '_product_currency', true ) ?: 'GBP';
 $image_url  = get_the_post_thumbnail_url( $product_id, 'product-thumbnail' );
 ?>
