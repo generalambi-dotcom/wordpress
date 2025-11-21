@@ -1116,3 +1116,420 @@ img {
 @media (min-width: 769px) {
     .hide-desktop { display: none; }
 }
+
+/* ==========================================================================
+   AJAX & INTERACTIVE COMPONENTS (v2.0.0)
+   ========================================================================== */
+
+/* Tool Card Enhancements */
+.tool-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.tool-card-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    flex: 1;
+}
+
+.tool-card-link:hover {
+    text-decoration: none;
+}
+
+.tool-card-info {
+    flex: 1;
+}
+
+.tool-card-categories {
+    margin-top: auto;
+    padding-top: var(--spacing-sm);
+}
+
+.tool-card-actions {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.tool-logo-placeholder {
+    background: var(--color-primary-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.tool-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--color-text-light);
+}
+
+.tool-rating .star {
+    color: #FBBF24;
+}
+
+.tool-pricing-badge {
+    font-size: 0.75rem;
+    padding: 0.125rem 0.5rem;
+    background: var(--color-bg-light);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-light);
+}
+
+.chip-more {
+    background: var(--color-bg-light);
+    color: var(--color-text-lighter);
+}
+
+/* Save Button */
+.save-tool-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1.125rem;
+}
+
+.save-tool-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.save-tool-btn.is-saved {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+}
+
+.save-tool-btn.is-saved .save-icon {
+    color: white;
+}
+
+.save-count {
+    font-size: 0.75rem;
+    color: var(--color-text-lighter);
+}
+
+/* Tool Hero Enhancements */
+.tool-hero-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.tool-pricing {
+    margin-top: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.pricing-label {
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.pricing-value {
+    color: var(--color-text-light);
+}
+
+.tool-social-links {
+    margin-top: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.social-label {
+    font-weight: 500;
+    color: var(--color-text-light);
+}
+
+.social-link {
+    color: var(--color-text-light);
+    transition: color 0.2s ease;
+}
+
+.social-link:hover {
+    color: var(--color-primary);
+}
+
+.tool-featured-image img {
+    border-radius: var(--radius-lg);
+    width: 100%;
+}
+
+.review-count {
+    color: var(--color-text-light);
+    font-size: 0.875rem;
+}
+
+.similar-tools-more {
+    text-align: center;
+    margin-top: var(--spacing-xl);
+}
+
+/* AJAX Directory Styles */
+.ai-directory-container {
+    position: relative;
+}
+
+.ai-directory-container.is-loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.7);
+    z-index: 10;
+}
+
+.filter-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-xl);
+    color: var(--color-text-light);
+}
+
+.loading-spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid var(--color-border);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Filter Pills Enhancement */
+.filter-pill {
+    position: relative;
+}
+
+.filter-pill .pill-count {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    margin-left: 0.25rem;
+}
+
+.filter-pill-link {
+    border-style: dashed;
+}
+
+/* AJAX Pagination */
+.ajax-pagination {
+    margin-top: var(--spacing-xl);
+}
+
+.pagination-list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-xs);
+    list-style: none;
+    flex-wrap: wrap;
+}
+
+.pagination-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 var(--spacing-sm);
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.pagination-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.pagination-btn.active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+}
+
+.pagination-dots {
+    padding: 0 var(--spacing-xs);
+    color: var(--color-text-lighter);
+}
+
+/* Load More */
+.load-more-container {
+    text-align: center;
+    margin-top: var(--spacing-2xl);
+}
+
+.load-more-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.tools-count-info {
+    margin-top: var(--spacing-sm);
+    font-size: 0.875rem;
+    color: var(--color-text-lighter);
+}
+
+/* Category Panel Enhancements */
+.category-panels {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+}
+
+.category-panel-info {
+    flex: 1;
+}
+
+.category-panel-title a {
+    color: var(--color-text);
+}
+
+.category-panel-title a:hover {
+    color: var(--color-primary);
+}
+
+.category-emoji {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+/* Toast Notifications */
+.toast-container {
+    position: fixed;
+    bottom: var(--spacing-xl);
+    right: var(--spacing-xl);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.toast {
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--color-text);
+    color: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    transform: translateX(100%);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+/* AJAX Error State */
+.ajax-error,
+.no-tools-found,
+.no-saved-tools {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: var(--spacing-3xl);
+    color: var(--color-text-light);
+}
+
+/* Section Description */
+.section-description {
+    color: var(--color-text-light);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Saved Tools Page */
+.saved-tools-grid {
+    transition: all 0.3s ease;
+}
+
+.saved-tools-grid .tool-card {
+    transition: all 0.3s ease;
+}
+
+/* Directory Hero */
+.directory-hero {
+    text-align: center;
+}
+
+/* Category Browse Section */
+.category-browse-section {
+    background: var(--color-bg-gray);
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    padding-left: calc(50vw - 50%);
+    padding-right: calc(50vw - 50%);
+}
+
+/* Print Styles */
+@media print {
+    .site-header,
+    .site-footer,
+    .tool-hero-actions,
+    .save-tool-btn,
+    .filter-pills,
+    .filters,
+    .load-more-btn {
+        display: none !important;
+    }
+}
+
+/* Additional Responsive Adjustments */
+@media (max-width: 640px) {
+    .tool-card-actions {
+        position: static;
+        margin-top: var(--spacing-md);
+        justify-content: flex-end;
+    }
+
+    .tool-hero-actions {
+        flex-direction: column;
+    }
+
+    .tool-hero-actions .btn {
+        width: 100%;
+    }
+
+    .toast-container {
+        left: var(--spacing-md);
+        right: var(--spacing-md);
+        bottom: var(--spacing-md);
+    }
+
+    .toast {
+        width: 100%;
+    }
+}

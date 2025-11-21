@@ -26,7 +26,21 @@ define( 'AI_OUTILS_CPT_SLUG', 'ai_tool' );
 define( 'AI_OUTILS_TAXONOMY_SLUG', 'ai_category' );
 
 // Theme version for cache busting
-define( 'AI_OUTILS_VERSION', '1.0.0' );
+define( 'AI_OUTILS_VERSION', '2.0.0' );
+
+/**
+ * ============================================================================
+ * INCLUDE MODULAR FILES
+ * ============================================================================
+ *
+ * Load helper functions and AJAX handlers from inc/ directory
+ */
+
+// AI Tools helper functions (meta getters, display helpers, user functions)
+require_once get_template_directory() . '/inc/ai-tools/helper-functions.php';
+
+// AI Tools AJAX handlers (filter, load more, save, click tracking)
+require_once get_template_directory() . '/inc/ai-tools/ajax-handlers.php';
 
 /**
  * ============================================================================

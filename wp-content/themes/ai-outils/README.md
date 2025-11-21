@@ -3,7 +3,7 @@
 A clean, modern WordPress theme for AI tools directory with membership functionality. Designed specifically for the AI Outils platform.
 
 ## Version
-1.0.0
+2.0.0
 
 ## Description
 AI Outils is a professionally designed WordPress theme built for AI tool directories and membership-based platforms. The theme provides a clean, maintainable architecture with clear separation between business logic (handled by plugins) and presentation (handled by the theme).
@@ -259,6 +259,25 @@ For support, please:
 3. Consult the plugin documentation for integration details
 
 ## Changelog
+
+### 2.0.0 - Architecture Refactor
+- **Modular Architecture**: Reorganized codebase into modular inc/ files
+  - `inc/ai-tools/helper-functions.php` - All AI tool meta getters and display helpers
+  - `inc/ai-tools/ajax-handlers.php` - AJAX endpoints for filtering, saving, and tracking
+- **AJAX Directory Features**:
+  - Category filtering with real-time updates
+  - Load more / infinite scroll pagination
+  - Save/bookmark tools (logged-in users)
+  - Click tracking for affiliate links
+  - Toast notifications for user feedback
+- **New Template Parts**:
+  - `template-parts/tool-hero.php` - Single tool hero section
+  - `template-parts/filters-bar.php` - Reusable filter UI component
+  - `template-parts/category-icons.php` - Category icon mappings
+- **Enhanced Tool Cards**: Save button, save count, improved accessibility
+- **Improved CSS**: Consolidated styles, removed inline styles, added AJAX component styles
+- **Better Code Organization**: Clearer separation of concerns, WordPress coding standards
+- **Preserved Compatibility**: All existing slugs, meta keys, and AJAX action names maintained
 
 ### 1.0.0 - Initial Release
 - Complete theme structure
