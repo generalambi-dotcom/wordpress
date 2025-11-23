@@ -35,12 +35,12 @@
                 </div>
 
                 <!-- Mobile Menu Toggle -->
-                <button class="mobile-menu-toggle hide-desktop" aria-label="<?php esc_attr_e( 'Toggle Menu', 'ai-outils' ); ?>">
-                    ☰
+                <button class="mobile-menu-toggle hide-desktop" aria-label="<?php esc_attr_e( 'Toggle Menu', 'ai-outils' ); ?>" aria-expanded="false" aria-controls="main-navigation">
+                    <span aria-hidden="true">☰</span>
                 </button>
 
                 <!-- Primary Navigation -->
-                <nav class="main-nav" aria-label="<?php esc_attr_e( 'Primary Navigation', 'ai-outils' ); ?>">
+                <nav id="main-navigation" class="main-nav" aria-label="<?php esc_attr_e( 'Primary Navigation', 'ai-outils' ); ?>">
                     <?php
                     wp_nav_menu( array(
                         'theme_location' => 'primary',

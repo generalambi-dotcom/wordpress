@@ -657,20 +657,310 @@ function ai_outils_membership_profile_form() {
 
 /**
  * ============================================================================
+ * REGISTER CUSTOM POST TYPE & TAXONOMY
+ * ============================================================================
+ *
+ * Built-in registration for AI Tools CPT and AI Category taxonomy.
+ * Only registers if not already registered by a plugin.
+ */
+
+/**
+ * Register AI Tool Custom Post Type
+ */
+function ai_outils_register_post_type() {
+    // Skip if already registered by plugin
+    if ( post_type_exists( AI_OUTILS_CPT_SLUG ) ) {
+        return;
+    }
+
+    $labels = array(
+        'name'                  => _x( 'AI Tools', 'Post Type General Name', 'ai-outils' ),
+        'singular_name'         => _x( 'AI Tool', 'Post Type Singular Name', 'ai-outils' ),
+        'menu_name'             => __( 'AI Tools', 'ai-outils' ),
+        'name_admin_bar'        => __( 'AI Tool', 'ai-outils' ),
+        'archives'              => __( 'Tool Archives', 'ai-outils' ),
+        'attributes'            => __( 'Tool Attributes', 'ai-outils' ),
+        'parent_item_colon'     => __( 'Parent Tool:', 'ai-outils' ),
+        'all_items'             => __( 'All Tools', 'ai-outils' ),
+        'add_new_item'          => __( 'Add New Tool', 'ai-outils' ),
+        'add_new'               => __( 'Add New', 'ai-outils' ),
+        'new_item'              => __( 'New Tool', 'ai-outils' ),
+        'edit_item'             => __( 'Edit Tool', 'ai-outils' ),
+        'update_item'           => __( 'Update Tool', 'ai-outils' ),
+        'view_item'             => __( 'View Tool', 'ai-outils' ),
+        'view_items'            => __( 'View Tools', 'ai-outils' ),
+        'search_items'          => __( 'Search Tool', 'ai-outils' ),
+        'not_found'             => __( 'Not found', 'ai-outils' ),
+        'not_found_in_trash'    => __( 'Not found in Trash', 'ai-outils' ),
+        'featured_image'        => __( 'Tool Image', 'ai-outils' ),
+        'set_featured_image'    => __( 'Set tool image', 'ai-outils' ),
+        'remove_featured_image' => __( 'Remove tool image', 'ai-outils' ),
+        'use_featured_image'    => __( 'Use as tool image', 'ai-outils' ),
+        'insert_into_item'      => __( 'Insert into tool', 'ai-outils' ),
+        'uploaded_to_this_item' => __( 'Uploaded to this tool', 'ai-outils' ),
+        'items_list'            => __( 'Tools list', 'ai-outils' ),
+        'items_list_navigation' => __( 'Tools list navigation', 'ai-outils' ),
+        'filter_items_list'     => __( 'Filter tools list', 'ai-outils' ),
+    );
+
+    $args = array(
+        'label'               => __( 'AI Tool', 'ai-outils' ),
+        'description'         => __( 'AI Tools directory entries', 'ai-outils' ),
+        'labels'              => $labels,
+        'supports'            => array( 'title', 'editor', 'thumbnail', 'excerpt', 'custom-fields', 'revisions' ),
+        'taxonomies'          => array( AI_OUTILS_TAXONOMY_SLUG ),
+        'hierarchical'        => false,
+        'public'              => true,
+        'show_ui'             => true,
+        'show_in_menu'        => true,
+        'menu_position'       => 5,
+        'menu_icon'           => 'dashicons-admin-tools',
+        'show_in_admin_bar'   => true,
+        'show_in_nav_menus'   => true,
+        'can_export'          => true,
+        'has_archive'         => 'tools',
+        'exclude_from_search' => false,
+        'publicly_queryable'  => true,
+        'capability_type'     => 'post',
+        'show_in_rest'        => true,
+        'rewrite'             => array(
+            'slug'       => 'tool',
+            'with_front' => false,
+        ),
+    );
+
+    register_post_type( AI_OUTILS_CPT_SLUG, $args );
+}
+add_action( 'init', 'ai_outils_register_post_type', 0 );
+
+/**
+ * Register AI Category Taxonomy
+ */
+function ai_outils_register_taxonomy() {
+    // Skip if already registered by plugin
+    if ( taxonomy_exists( AI_OUTILS_TAXONOMY_SLUG ) ) {
+        return;
+    }
+
+    $labels = array(
+        'name'                       => _x( 'AI Categories', 'Taxonomy General Name', 'ai-outils' ),
+        'singular_name'              => _x( 'AI Category', 'Taxonomy Singular Name', 'ai-outils' ),
+        'menu_name'                  => __( 'Categories', 'ai-outils' ),
+        'all_items'                  => __( 'All Categories', 'ai-outils' ),
+        'parent_item'                => __( 'Parent Category', 'ai-outils' ),
+        'parent_item_colon'          => __( 'Parent Category:', 'ai-outils' ),
+        'new_item_name'              => __( 'New Category Name', 'ai-outils' ),
+        'add_new_item'               => __( 'Add New Category', 'ai-outils' ),
+        'edit_item'                  => __( 'Edit Category', 'ai-outils' ),
+        'update_item'                => __( 'Update Category', 'ai-outils' ),
+        'view_item'                  => __( 'View Category', 'ai-outils' ),
+        'separate_items_with_commas' => __( 'Separate categories with commas', 'ai-outils' ),
+        'add_or_remove_items'        => __( 'Add or remove categories', 'ai-outils' ),
+        'choose_from_most_used'      => __( 'Choose from the most used', 'ai-outils' ),
+        'popular_items'              => __( 'Popular Categories', 'ai-outils' ),
+        'search_items'               => __( 'Search Categories', 'ai-outils' ),
+        'not_found'                  => __( 'Not Found', 'ai-outils' ),
+        'no_terms'                   => __( 'No categories', 'ai-outils' ),
+        'items_list'                 => __( 'Categories list', 'ai-outils' ),
+        'items_list_navigation'      => __( 'Categories list navigation', 'ai-outils' ),
+    );
+
+    $args = array(
+        'labels'             => $labels,
+        'hierarchical'       => true,
+        'public'             => true,
+        'show_ui'            => true,
+        'show_admin_column'  => true,
+        'show_in_nav_menus'  => true,
+        'show_tagcloud'      => true,
+        'show_in_rest'       => true,
+        'rewrite'            => array(
+            'slug'         => 'ai-category',
+            'with_front'   => false,
+            'hierarchical' => true,
+        ),
+    );
+
+    register_taxonomy( AI_OUTILS_TAXONOMY_SLUG, array( AI_OUTILS_CPT_SLUG ), $args );
+}
+add_action( 'init', 'ai_outils_register_taxonomy', 0 );
+
+/**
+ * ============================================================================
+ * AI TOOL META BOX
+ * ============================================================================
+ */
+
+/**
+ * Add meta box for AI Tool custom fields
+ */
+function ai_outils_add_meta_boxes() {
+    add_meta_box(
+        'ai_tool_details',
+        __( 'Tool Details', 'ai-outils' ),
+        'ai_outils_meta_box_callback',
+        AI_OUTILS_CPT_SLUG,
+        'normal',
+        'high'
+    );
+}
+add_action( 'add_meta_boxes', 'ai_outils_add_meta_boxes' );
+
+/**
+ * Meta box callback function
+ *
+ * @param WP_Post $post Current post object.
+ */
+function ai_outils_meta_box_callback( $post ) {
+    // Add nonce for security
+    wp_nonce_field( 'ai_outils_save_meta', 'ai_outils_meta_nonce' );
+
+    // Get existing values
+    $pricing        = get_post_meta( $post->ID, '_ai_tool_pricing', true );
+    $affiliate_link = get_post_meta( $post->ID, '_ai_tool_affiliate_link', true );
+    $rating         = get_post_meta( $post->ID, '_ai_tool_rating', true );
+    $verified       = get_post_meta( $post->ID, '_ai_tool_verified', true );
+    $video_url      = get_post_meta( $post->ID, '_ai_tool_video_url', true );
+    $social_links   = get_post_meta( $post->ID, '_ai_tool_social_links', true );
+    ?>
+    <style>
+        .ai-tool-meta-row { margin-bottom: 15px; }
+        .ai-tool-meta-row label { display: block; font-weight: 600; margin-bottom: 5px; }
+        .ai-tool-meta-row input[type="text"],
+        .ai-tool-meta-row input[type="url"],
+        .ai-tool-meta-row input[type="number"],
+        .ai-tool-meta-row textarea,
+        .ai-tool-meta-row select { width: 100%; max-width: 500px; }
+        .ai-tool-meta-row .description { color: #666; font-style: italic; margin-top: 5px; }
+    </style>
+    <div class="ai-tool-meta-fields">
+        <div class="ai-tool-meta-row">
+            <label for="ai_tool_pricing"><?php _e( 'Pricing Model', 'ai-outils' ); ?></label>
+            <select name="ai_tool_pricing" id="ai_tool_pricing">
+                <option value=""><?php _e( '-- Select --', 'ai-outils' ); ?></option>
+                <option value="Free" <?php selected( $pricing, 'Free' ); ?>><?php _e( 'Free', 'ai-outils' ); ?></option>
+                <option value="Freemium" <?php selected( $pricing, 'Freemium' ); ?>><?php _e( 'Freemium', 'ai-outils' ); ?></option>
+                <option value="Free Trial" <?php selected( $pricing, 'Free Trial' ); ?>><?php _e( 'Free Trial', 'ai-outils' ); ?></option>
+                <option value="Paid" <?php selected( $pricing, 'Paid' ); ?>><?php _e( 'Paid', 'ai-outils' ); ?></option>
+                <option value="Contact for Pricing" <?php selected( $pricing, 'Contact for Pricing' ); ?>><?php _e( 'Contact for Pricing', 'ai-outils' ); ?></option>
+            </select>
+        </div>
+
+        <div class="ai-tool-meta-row">
+            <label for="ai_tool_affiliate_link"><?php _e( 'Website / Affiliate Link', 'ai-outils' ); ?></label>
+            <input type="url" name="ai_tool_affiliate_link" id="ai_tool_affiliate_link" value="<?php echo esc_url( $affiliate_link ); ?>" placeholder="https://example.com">
+            <p class="description"><?php _e( 'The main website URL or affiliate link for this tool.', 'ai-outils' ); ?></p>
+        </div>
+
+        <div class="ai-tool-meta-row">
+            <label for="ai_tool_rating"><?php _e( 'Rating (0-5)', 'ai-outils' ); ?></label>
+            <input type="number" name="ai_tool_rating" id="ai_tool_rating" value="<?php echo esc_attr( $rating ); ?>" min="0" max="5" step="0.1" placeholder="4.5">
+        </div>
+
+        <div class="ai-tool-meta-row">
+            <label for="ai_tool_verified">
+                <input type="checkbox" name="ai_tool_verified" id="ai_tool_verified" value="1" <?php checked( $verified, '1' ); ?>>
+                <?php _e( 'Verified Tool', 'ai-outils' ); ?>
+            </label>
+            <p class="description"><?php _e( 'Mark this tool as verified/reviewed.', 'ai-outils' ); ?></p>
+        </div>
+
+        <div class="ai-tool-meta-row">
+            <label for="ai_tool_video_url"><?php _e( 'Video URL', 'ai-outils' ); ?></label>
+            <input type="url" name="ai_tool_video_url" id="ai_tool_video_url" value="<?php echo esc_url( $video_url ); ?>" placeholder="https://youtube.com/watch?v=...">
+            <p class="description"><?php _e( 'YouTube or Vimeo video URL for demo/overview.', 'ai-outils' ); ?></p>
+        </div>
+
+        <div class="ai-tool-meta-row">
+            <label for="ai_tool_social_links"><?php _e( 'Social Links', 'ai-outils' ); ?></label>
+            <textarea name="ai_tool_social_links" id="ai_tool_social_links" rows="4" placeholder="Twitter: https://twitter.com/example&#10;LinkedIn: https://linkedin.com/company/example"><?php echo esc_textarea( $social_links ); ?></textarea>
+            <p class="description"><?php _e( 'One per line: Platform: URL', 'ai-outils' ); ?></p>
+        </div>
+    </div>
+    <?php
+}
+
+/**
+ * Save meta box data
+ *
+ * @param int $post_id Post ID.
+ */
+function ai_outils_save_meta( $post_id ) {
+    // Check nonce
+    if ( ! isset( $_POST['ai_outils_meta_nonce'] ) || ! wp_verify_nonce( $_POST['ai_outils_meta_nonce'], 'ai_outils_save_meta' ) ) {
+        return;
+    }
+
+    // Check autosave
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+        return;
+    }
+
+    // Check permissions
+    if ( ! current_user_can( 'edit_post', $post_id ) ) {
+        return;
+    }
+
+    // Save fields
+    $fields = array(
+        'ai_tool_pricing'        => '_ai_tool_pricing',
+        'ai_tool_affiliate_link' => '_ai_tool_affiliate_link',
+        'ai_tool_rating'         => '_ai_tool_rating',
+        'ai_tool_video_url'      => '_ai_tool_video_url',
+        'ai_tool_social_links'   => '_ai_tool_social_links',
+    );
+
+    foreach ( $fields as $field => $meta_key ) {
+        if ( isset( $_POST[ $field ] ) ) {
+            $value = sanitize_text_field( $_POST[ $field ] );
+            if ( strpos( $meta_key, 'link' ) !== false || strpos( $meta_key, 'url' ) !== false ) {
+                $value = esc_url_raw( $_POST[ $field ] );
+            }
+            update_post_meta( $post_id, $meta_key, $value );
+        }
+    }
+
+    // Handle checkbox
+    $verified = isset( $_POST['ai_tool_verified'] ) ? '1' : '';
+    update_post_meta( $post_id, '_ai_tool_verified', $verified );
+}
+add_action( 'save_post_' . AI_OUTILS_CPT_SLUG, 'ai_outils_save_meta' );
+
+/**
+ * Flush rewrite rules on theme activation
+ */
+function ai_outils_activation() {
+    ai_outils_register_post_type();
+    ai_outils_register_taxonomy();
+    flush_rewrite_rules();
+}
+add_action( 'after_switch_theme', 'ai_outils_activation' );
+
+/**
+ * ============================================================================
  * ADMIN NOTICES
  * ============================================================================
  */
 
 /**
- * Admin notice if required plugins are not active
+ * Admin notice for theme setup
  */
 function ai_outils_admin_notices() {
-    if ( ! ai_outils_has_tools_plugin() ) {
-        ?>
-        <div class="notice notice-warning">
-            <p><strong>AI Outils Theme:</strong> The AI Tools plugin is required for this theme to function properly. Please install and activate it.</p>
-        </div>
-        <?php
+    // Only show on theme pages
+    $screen = get_current_screen();
+    if ( ! $screen || strpos( $screen->id, 'theme' ) === false ) {
+        return;
     }
+
+    // Check if we have any AI tools
+    $tools_count = wp_count_posts( AI_OUTILS_CPT_SLUG );
+    if ( isset( $tools_count->publish ) && $tools_count->publish > 0 ) {
+        return;
+    }
+    ?>
+    <div class="notice notice-info is-dismissible">
+        <p><strong><?php _e( 'AI Outils Theme:', 'ai-outils' ); ?></strong> <?php _e( 'Welcome! To get started, add some AI Tools from the AI Tools menu in the sidebar.', 'ai-outils' ); ?></p>
+    </div>
+    <?php
 }
 add_action( 'admin_notices', 'ai_outils_admin_notices' );

@@ -29,8 +29,8 @@ AI Outils is a professionally designed WordPress theme built for AI tool directo
 
 - WordPress 6.0 or higher
 - PHP 7.4 or higher
-- **Required Plugin:** AI Tools Plugin (for custom post type and taxonomy)
-- **Recommended Plugin:** AI Membership Plugin (for membership features)
+- **No plugins required!** Theme includes built-in Custom Post Type and Taxonomy
+- **Optional Plugin:** AI Membership Plugin (for advanced membership features)
 
 ## Installation
 
@@ -42,12 +42,16 @@ AI Outils is a professionally designed WordPress theme built for AI tool directo
 4. Choose the theme ZIP file and click **Install Now**
 5. Click **Activate**
 
-### Step 2: Install Required Plugins
+### Step 2: Built-in Features (No Plugins Required!)
 
-The theme requires the following plugins to function properly:
+The theme includes everything you need to get started:
 
-1. **AI Tools Plugin** - Provides the custom post type (`ai_tool`) and taxonomy (`ai_category`)
-2. **AI Membership Plugin** (optional) - Provides membership functionality for dashboard, recommendations, and saved tools
+1. **Custom Post Type:** `ai_tool` - For adding AI tools
+2. **Taxonomy:** `ai_category` - For categorizing tools
+3. **Meta Box:** Built-in fields for pricing, affiliate links, ratings, etc.
+4. **AJAX Functionality:** Category filtering, tool saving, click tracking
+
+**Optional:** Install the AI Membership Plugin for advanced membership features.
 
 ### Step 3: Configure Theme Settings
 
@@ -135,21 +139,25 @@ Create the following pages and assign the appropriate templates:
      - Rating
      - Verified status
 
-## Plugin Integration
+## Built-in Features
 
-### AI Tools Plugin
+### AI Tools Custom Post Type
 
-The theme expects the AI Tools plugin to register:
+The theme automatically registers:
 - Custom post type: `ai_tool` (configurable in functions.php)
 - Taxonomy: `ai_category` (configurable in functions.php)
 
-The theme uses the following meta fields (adjust based on your actual plugin):
-- `_ai_tool_pricing_model` - Pricing information
-- `_ai_tool_website_url` - Tool website URL
-- `_ai_tool_video_url` - YouTube video URL
-- `_ai_tool_verified` - Verified badge (true/false)
+**Note:** If a plugin already registers these, the theme will use the plugin's registration instead (no conflicts).
+
+### Built-in Meta Fields
+
+The theme includes a meta box with the following fields:
+- `_ai_tool_pricing` - Pricing model (Free, Freemium, Paid, etc.)
+- `_ai_tool_affiliate_link` - Website/affiliate URL
+- `_ai_tool_video_url` - YouTube/Vimeo video URL
+- `_ai_tool_verified` - Verified badge (checkbox)
 - `_ai_tool_rating` - Rating (0-5)
-- `_ai_tool_social_links` - Social media links (array)
+- `_ai_tool_social_links` - Social media links (text area)
 
 ### AI Membership Plugin
 
@@ -260,7 +268,12 @@ For support, please:
 
 ## Changelog
 
-### 2.0.0 - Architecture Refactor
+### 2.0.0 - Complete Standalone Theme
+- **No Plugin Required**: Theme now works out of the box!
+  - Built-in Custom Post Type registration (`ai_tool`)
+  - Built-in Taxonomy registration (`ai_category`)
+  - Built-in Meta Box for tool details (pricing, URL, rating, video, etc.)
+  - Automatic rewrite rules flush on theme activation
 - **Modular Architecture**: Reorganized codebase into modular inc/ files
   - `inc/ai-tools/helper-functions.php` - All AI tool meta getters and display helpers
   - `inc/ai-tools/ajax-handlers.php` - AJAX endpoints for filtering, saving, and tracking
@@ -275,9 +288,9 @@ For support, please:
   - `template-parts/filters-bar.php` - Reusable filter UI component
   - `template-parts/category-icons.php` - Category icon mappings
 - **Enhanced Tool Cards**: Save button, save count, improved accessibility
-- **Improved CSS**: Consolidated styles, removed inline styles, added AJAX component styles
+- **Improved CSS**: Consolidated styles, scroll header states, mobile menu animations
 - **Better Code Organization**: Clearer separation of concerns, WordPress coding standards
-- **Preserved Compatibility**: All existing slugs, meta keys, and AJAX action names maintained
+- **Plugin Compatible**: If a plugin registers the same CPT/taxonomy, theme defers to plugin
 
 ### 1.0.0 - Initial Release
 - Complete theme structure

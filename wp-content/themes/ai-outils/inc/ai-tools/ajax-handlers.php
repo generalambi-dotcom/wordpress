@@ -505,17 +505,71 @@ function ai_outils_ajax_pagination( $current, $total ) {
 }
 
 /**
+ * Check if current page needs AJAX scripts
+ *
+ * @return bool
+ */
+function ai_outils_needs_ajax_scripts() {
+    // Front page with tools
+    if ( is_front_page() ) {
+        return true;
+    }
+
+    // AI Tool pages
+    if ( is_singular( AI_OUTILS_CPT_SLUG ) ) {
+        return true;
+    }
+
+    // AI Tool archives
+    if ( is_post_type_archive( AI_OUTILS_CPT_SLUG ) ) {
+        return true;
+    }
+
+    // AI Category taxonomy
+    if ( is_tax( AI_OUTILS_TAXONOMY_SLUG ) ) {
+        return true;
+    }
+
+    // Page templates - check by template file name
+    if ( is_page() ) {
+        $template = get_page_template_slug();
+        $needs_ajax = array(
+            'page-ai-tools-directory.php',
+            'page-saved-tools.php',
+            'page-members-dashboard.php',
+            'page-tool-recommendations.php',
+        );
+        if ( in_array( $template, $needs_ajax, true ) ) {
+            return true;
+        }
+
+        // Also check by page slug for pages using default template
+        global $post;
+        if ( $post ) {
+            $ajax_pages = array( 'ai-tools-directory', 'tools', 'saved-tools', 'members-dashboard' );
+            if ( in_array( $post->post_name, $ajax_pages, true ) ) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+/**
  * Enqueue AJAX scripts and localize data
  *
  * Called from main theme's enqueue function.
  */
 function ai_outils_enqueue_ajax_scripts() {
     // Only enqueue on pages that need it
-    if ( ! is_page_template( 'page-ai-tools-directory.php' )
-         && ! is_tax( AI_OUTILS_TAXONOMY_SLUG )
-         && ! is_singular( AI_OUTILS_CPT_SLUG )
-         && ! is_post_type_archive( AI_OUTILS_CPT_SLUG )
-         && ! is_page_template( 'page-saved-tools.php' ) ) {
+    if ( ! ai_outils_needs_ajax_scripts() ) {
+        return;
+    }
+
+    // Check if file exists
+    $js_file = get_template_directory() . '/assets/js/ai-directory.js';
+    if ( ! file_exists( $js_file ) ) {
         return;
     }
 

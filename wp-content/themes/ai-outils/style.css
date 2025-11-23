@@ -1,12 +1,12 @@
 /*
 Theme Name: AI Outils
-Theme URI: https://example.com
-Description: A clean, modern WordPress theme for AI tools directory with membership functionality. Designed for the AI Outils platform.
-Version: 1.0.0
+Theme URI: https://ai-outils.com
+Description: A clean, modern WordPress theme for AI tools directory with membership functionality. Features include AJAX filtering, tool saving, click tracking, and a beautiful responsive design.
+Version: 2.0.0
 Author: AI Outils Team
-Author URI: https://example.com
+Author URI: https://ai-outils.com
 Text Domain: ai-outils
-Tags: directory, membership, tools, ai, clean, modern, responsive
+Tags: directory, membership, tools, ai, clean, modern, responsive, ajax, custom-post-types
 Requires at least: 6.0
 Tested up to: 6.4
 Requires PHP: 7.4
@@ -1492,6 +1492,58 @@ img {
     margin-right: calc(-50vw + 50%);
     padding-left: calc(50vw - 50%);
     padding-right: calc(50vw - 50%);
+}
+
+/* Scroll Header States */
+.site-header {
+    transition: transform 0.3s ease;
+}
+
+.site-header.scroll-down {
+    transform: translateY(-100%);
+}
+
+.site-header.scroll-up {
+    transform: translateY(0);
+}
+
+/* Mobile Menu Toggle Animation */
+.mobile-menu-toggle {
+    position: relative;
+    z-index: 1001;
+}
+
+.mobile-menu-toggle[aria-expanded="true"] {
+    color: var(--color-primary);
+}
+
+/* Ensure nav is properly styled when active on mobile */
+@media (max-width: 768px) {
+    .main-nav {
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .main-nav.active {
+        display: block !important;
+    }
+
+    .header-actions {
+        display: none;
+    }
+
+    .main-nav.active + .header-actions,
+    .main-nav.active ~ .header-actions {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--color-bg);
+        padding: var(--spacing-md);
+        border-top: 1px solid var(--color-border);
+    }
 }
 
 /* Print Styles */
